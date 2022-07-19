@@ -1,0 +1,9 @@
+pyproject.toml
+setup.cfg
+dist/
+src/servicepy.egg-info/
+.DS_Store
+.python-version
+src/servicepy/__pycache__/
+tests/local_*
+_tmp/
