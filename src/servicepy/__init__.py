@@ -1,9 +1,6 @@
 from __future__ import annotations
 import time
 import re
-import os
-from datetime import datetime
-import io
 import urllib
 import requests
 from requests.auth import HTTPBasicAuth
@@ -117,7 +114,7 @@ class Table(object):
         Faz requisicao de uma tabela no sistema
         Service Now.
         if incremental!='':
-            w.append('sys_updated_on>={}'.format(incremental))
+            w.append('sys_updated_on>{}'.format(incremental))
         """
         url = self.create_url(fields=fields
             , where=where
@@ -156,12 +153,19 @@ class Table(object):
         w = where.copy()
         sys_updated_pos = self.__find_sys_update_pos(w)
         if sys_updated_pos is None:
-            w.append('sys_updated_on>={}'.format('1800-01-01 00:00:00'))
+            w.append('sys_updated_on>{}'.format('1800-01-01 00:00:00'))
         data = []
-        while limit>0:
+        while True:
             time.sleep(2)
-            buffer = limit if limit<self._conn.buffer else self._conn.buffer
-            _data = self.req_data(fields, w, orderby, offset, buffer)
+            buffer = limit if (limit>0 and limit<self._conn.buffer) else self._conn.buffer
+            try:
+                _data = self.req_data(fields, w, orderby, offset, buffer)
+            except KeyboardInterrupt:
+                data += []
+                break
+            except:
+                data += []
+                break
             #print("Limite antes: {}".format(limit))
             limit = limit - len(_data)
             #print("Limite depois: {}".format(limit))
@@ -177,7 +181,7 @@ class Table(object):
             #print("Tamanho dos dados {}:".format(len(data)))
             #print("Tamanho da requisicao {}:".format(len(_data)))
             #print("Limite restante {}:".format(limit))
-            if len(_data)<buffer:
+            if len(_data)<buffer: # or limit<0:
                 break
             self.__replace_sys_update(where=w, sys_updated_on=self.__get_max_value('sys_updated_on', _data)) # _data[-1]['sys_updated_on'])
         print("\nEncontrados %s registros." % len(data))
@@ -272,4 +276,4 @@ class Table(object):
         """
         pos = self.__find_sys_update_pos(where)
         if pos is not None:
-            where[pos] = 'sys_updated_on>={}'.format(sys_updated_on)
+            where[pos] = 'sys_updated_on>{}'.format(sys_updated_on)
