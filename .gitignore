@@ -1,5 +1,6 @@
 pyproject.toml
-setup.cfg
+/setup.cfg
+/setup.py
 dist/
 src/servicepy.egg-info/
 .DS_Store
