@@ -124,7 +124,7 @@ class Table(object):
         print("\nURL de busca: %s" % (url))
         print("\nBuffer: %s" % (str(limit)))
         r = self._conn.http_request(url)
-        rcont = r.content.decode("utf-8-sig").replace("\n","")
+        rcont = r.content.decode("utf-8", "ignore").replace("\n","").replace(",}\"\"", "")
         resp_data = json.loads(rcont)
         if 'error' in resp_data.keys():
             raise Exception(resp_data['error']['message'])
