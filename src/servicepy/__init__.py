@@ -163,7 +163,8 @@ class Table(object):
             except KeyboardInterrupt:
                 data += []
                 break
-            except:
+            except Exception as e:
+                print(e)
                 data += []
                 break
             #print("Limite antes: {}".format(limit))
